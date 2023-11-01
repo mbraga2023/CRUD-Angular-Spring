@@ -6,12 +6,13 @@ import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Cursos } from '../../model/cursos';
 import { Aulas } from '../../model/aulas';
+import { Subscription } from 'rxjs';
+
 
 @Component({
   selector: 'app-cursos-form',
   templateUrl: './cursos-form.component.html',
   styleUrls: ['./cursos-form.component.scss'],
-
 })
 export class CursosFormComponent {
   form: FormGroup;
@@ -25,8 +26,15 @@ export class CursosFormComponent {
   ) {
     this.form = this.formBuilder.group({
       _id: [''],
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-      category: ['', [Validators.required]]
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(100),
+        ],
+      ],
+      category: ['', [Validators.required]],
     });
   }
 
@@ -34,43 +42,72 @@ export class CursosFormComponent {
     const curso: Cursos = this.route.snapshot.data['curso'];
     this.form = this.formBuilder.group({
       _id: [curso._id],
-      name:[ curso.name, [Validators.required,
-      Validators.minLength(2),
-      Validators.maxLength(100)]],
+      name: [
+        curso.name,
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(100),
+        ],
+      ],
       category: [curso.category, [Validators.required]],
-      aulas: this.formBuilder.array(this.obterAulas(curso))
+      aulas: this.formBuilder.array(
+        this.obterAulas(curso),
+        Validators.required
+      ),
     });
   }
 
-  private obterAulas(curso: Cursos){
+  private obterAulas(curso: Cursos) {
     const aulas = [];
-    if(curso?.aulas){
-      curso.aulas.forEach(aula => aulas.push(this.criarAula(aula)));
+    if (curso?.aulas) {
+      curso.aulas.forEach((aula) => aulas.push(this.criarAula(aula)));
     } else {
       aulas.push(this.criarAula());
     }
     return aulas;
   }
 
-  private criarAula(aula: Aulas = {id:'',  name: '', youtubeUrl: ''}){
+  private criarAula(aula: Aulas = { id: '', name: '', youtubeUrl: '' }) {
     return this.formBuilder.group({
       id: [aula.id],
-      nome:[aula.name],
-      youtubeUrl: [aula.youtubeUrl]
-    })
+      name: [
+        aula.name,
+       /* [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(100),
+        ],*/
+      ],
+      youtubeUrl: [
+        aula.youtubeUrl,/*
+        [
+          Validators.required,
+          Validators.minLength(5),
+          Validators.maxLength(100),
+        ],*/
+      ],
+    });
   }
 
   onSubmit() {
     // Check if the form is valid and category is not null or "null"
-    if (this.form.valid && this.form.value.category && this.form.value.category !== 'null') {
-      this.service.save(this.form.value)
-        .subscribe(
-          result => this.onSuccess(),
-          error => this.onError()
-        );
+    if (
+      this.form.valid &&
+      this.form.value.category &&
+      this.form.value.category !== 'null'
+    ) {
+      this.service.save(this.form.value).subscribe({
+        next: (result) => this.onSuccess(),
+        error: (error) => this.onError(),
+      });
     } else {
       // Handle invalid form or category
-      this.snackBar.open('Por favor, preencha todos os campos corretamente.', '', { duration: 5000 });
+      this.snackBar.open(
+        'Por favor, preencha todos os campos corretamente.',
+        '',
+        { duration: 5000 }
+      );
     }
   }
 
@@ -94,12 +131,16 @@ export class CursosFormComponent {
       return 'Campo obrigatório';
     }
     if (field?.hasError('minlength')) {
-      const requiredLength = field.errors ? field.errors['minlength']['requiredLength'] : 3;
+      const requiredLength = field.errors
+        ? field.errors['minlength']['requiredLength']
+        : 3;
 
       return `Tamanho mínimo de ${requiredLength} caracteres.`;
     }
     if (field?.hasError('maxlength')) {
-      const requiredLength = field.errors ? field.errors['maxlength']['requiredLength'] : 100;
+      const requiredLength = field.errors
+        ? field.errors['maxlength']['requiredLength']
+        : 100;
 
       return `Tamanho máximo de ${requiredLength} caracteres.`;
     }
@@ -107,7 +148,22 @@ export class CursosFormComponent {
     return 'Campo inválido';
   }
 
-  getAulasFormArray(){
+  getAulasFormArray() {
     return (<UntypedFormArray>this.form.get('aulas')).controls;
   }
+
+  addAula() {
+    const aulas = this.form.get('aulas') as UntypedFormArray;
+    aulas.push(this.criarAula());
   }
+
+  removeAula(index: number) {
+    const aulas = this.form.get('aulas') as UntypedFormArray;
+    aulas.removeAt(index);
+  }
+
+  isFormArrayRequired() {
+    const aulas = this.form.get('aulas') as UntypedFormArray;
+    return !aulas.valid && aulas.hasError('required') && aulas.touched;
+  }
+}

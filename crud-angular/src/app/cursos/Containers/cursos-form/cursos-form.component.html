@@ -24,28 +24,41 @@
         </mat-form-field>
 
         <mat-toolbar>
-          <span>Aulas</span>
-          <button mat-icon-button>
-            <mat-icon aria-label="Adicionar uma nova aula">add</mat-icon>
-          </button>
+          <div class="align-left">
+            <span>Aulas</span>
+          </div>
+          <div class="align-right add-button"> Adicionar
+            <button mat-icon-button (click)="addAula()" color="primary">
+              <mat-icon aria-label="Adicionar uma nova aula">add</mat-icon>
+            </button>
+          </div>
         </mat-toolbar>
 
-        <table style="width:100%" formArrayName="aulas"
+        <mat-error *ngIf="isFormArrayRequired()" class="align-left"> Adicione uma aula </mat-error>
+
+        <table formArrayName="aulas"
         *ngFor="let a of getAulasFormArray();
         let i = index ">
           <tr [formGroupName]="i">
-            <td>
-              <mat-form-field style="width:70%">
+            <td style="width: 65%">
+              <mat-form-field class="full-width">
                 <mat-label> Título Aula</mat-label>
                 <input matInput formControlName="name">
+                <!-- <mat-error *ngIf="getAulasFormArray()[i].get('name')?.invalid && form.get('name')?.touched">Campo inválido</mat-error>
+-->
               </mat-form-field>
             </td>
-            <td>
-              <mat-form-field style="width:30%">
+            <td style="width: 30%">
+              <mat-form-field class="full-width">
                 <mat-label> URL Aula</mat-label>
                 <span matPrefix>http://youtube.be/</span>
                 <input matInput formControlName="youtubeUrl">
+               <!-- <mat-error *ngIf="getAulasFormArray()[i].get('youtubeUrl')?.invalid && form.get('youtubeUrl')?.touched">Campo inválido</mat-error>
+-->
               </mat-form-field>
+            </td>
+            <td>
+              <mat-icon aria-label="Remover aula" (click)="removeAula(i)"  color="warn">delete</mat-icon>
             </td>
           </tr>
         </table>

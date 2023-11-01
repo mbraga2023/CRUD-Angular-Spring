@@ -12,3 +12,20 @@ mat-card {
   width: 100%;
   min-width: 150px;//tamanho mínimo do formulario
 }
+
+.align-left {
+  flex: 1; /* Grow to fill available space on the left */
+  display: flex;
+  align-items: center;
+}
+
+.align-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Align the button to the right */
+}
+
+.add-button {
+  margin-left: 8px;
+  font-size: medium;
+}
