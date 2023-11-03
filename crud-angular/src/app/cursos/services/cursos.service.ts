@@ -25,6 +25,7 @@ export class CursosService {
     if(record._id){
       return this.update(record);
     }
+    console.log(record);
     return this.create(record);
   }
 

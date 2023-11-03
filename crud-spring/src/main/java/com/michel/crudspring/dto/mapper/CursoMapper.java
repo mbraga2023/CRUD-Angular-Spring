@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.michel.crudspring.dto.AulaDTO;
 import com.michel.crudspring.dto.CursosDTO;
 import com.michel.crudspring.enums.Category;
+import com.michel.crudspring.model.Aulas;
 import com.michel.crudspring.model.CursosModel;
 
 @Component
@@ -38,6 +39,16 @@ public class CursoMapper {
 		curso.setName(cursoDTO.name());
 		curso.setCategory(convertCategoryValue(cursoDTO.category()));
 
+		List<Aulas> aulas = cursoDTO.aulas().stream().map(aulaDTO ->{
+			var aula = new Aulas();
+			aula.setId(aulaDTO.id());
+			aula.setName(aulaDTO.name());
+			aula.setYoutubeUrl(aulaDTO.youtubeUrl());
+			aula.setCurso(curso);
+			return aula;
+			
+		}).collect(Collectors.toList());
+		curso.setAulas(aulas);
 		return curso;
 		//builder patter
 	}

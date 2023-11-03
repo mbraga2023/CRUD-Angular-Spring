@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import com.michel.crudspring.dto.CursosDTO;
 import com.michel.crudspring.dto.mapper.CursoMapper;
 import com.michel.crudspring.exception.RecordNotFoundException;
+import com.michel.crudspring.model.CursosModel;
 import com.michel.crudspring.repository.CursosRepository;
 
 import jakarta.validation.Valid;
@@ -43,8 +44,11 @@ public class CursoService {
 			@Valid @NotNull CursosDTO cursoDTO) {
 		return cursosRepo.findById(id)
 				.map(recordFound -> {// se houver o registro
+			CursosModel curso = cursoMapper.toEntity(cursoDTO);
 			recordFound.setName(cursoDTO.name());
 			recordFound.setCategory(this.cursoMapper.convertCategoryValue(cursoDTO.category()));
+			recordFound.getAulas().clear();
+			curso.getAulas().forEach(recordFound.getAulas()::add);
 			return cursoMapper.toDTO(cursosRepo.save(recordFound));
 		})
 				.orElseThrow(() -> new RecordNotFoundException(id)) ;
