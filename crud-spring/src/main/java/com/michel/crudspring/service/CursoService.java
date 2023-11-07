@@ -1,8 +1,14 @@
 package com.michel.crudspring.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
+import com.michel.crudspring.dto.CursoPageDTO;
 import com.michel.crudspring.dto.CursosDTO;
 import com.michel.crudspring.dto.mapper.CursoMapper;
 import com.michel.crudspring.exception.RecordNotFoundException;
@@ -10,8 +16,10 @@ import com.michel.crudspring.model.CursosModel;
 import com.michel.crudspring.repository.CursosRepository;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 @Validated
 @Service
@@ -24,10 +32,20 @@ public class CursoService {
 		this.cursoMapper = cursoMapper;
 	}
 	
-	public List<CursosDTO> list() {
-		return cursosRepo.findAll().stream()
+	/* sem paginação
+	 * 
+	 * public List<CursosDTO> list() { return cursosRepo.findAll().stream()
+	 * .map(cursoMapper::toDTO) .toList(); }
+	 */
+	
+	//com paginação
+	public CursoPageDTO list(@PositiveOrZero int pageNumber, @Positive @Max(100) int pageSize) {
+		Page<CursosModel> page = cursosRepo.findAll(PageRequest.of(pageNumber, pageSize));
+		List<CursosDTO> cursos = page.get()
 				.map(cursoMapper::toDTO)
-				.toList();
+				.collect(Collectors.toList());
+		
+		return new CursoPageDTO(cursos, page.getTotalElements(), page.getTotalPages());
 }
 	
 	public CursosDTO findById(@NotNull @Positive Long id) {

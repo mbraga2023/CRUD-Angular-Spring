@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Cursos } from '../model/cursos';
-import { HttpClient } from '@angular/common/http';
-import { first, tap } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, first, tap } from 'rxjs';
+import { CursosPage } from '../model/cursosPage';
 
 @Injectable({
   providedIn: 'root'
@@ -9,16 +10,17 @@ import { first, tap } from 'rxjs';
 export class CursosService {
 
   private readonly API = 'api/cursos';
+  private cache: Cursos[] = [];
+
   constructor(
     private httpClient: HttpClient
   ) { }
 
-  list(){
-    return this.httpClient.get<Cursos[]>(this.API)//Observable que retorna um array de Cursos
-  .pipe(
-    first(),
-    tap (cursos => console.log(cursos))
-  );
+  list(page = 0, pageSize = 10) {
+    return this.httpClient.get<CursosPage>(`${this.API}?pageNumber=${page}&pageSize=${pageSize}`).pipe(
+      first(),
+      tap(data => (this.cache = data.cursos))
+    );
   }
 
   save(record: Partial<Cursos>){

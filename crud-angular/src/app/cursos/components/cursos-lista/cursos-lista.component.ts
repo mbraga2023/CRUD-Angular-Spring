@@ -13,7 +13,6 @@ export class CursosListaComponent {
   @Output() edit = new EventEmitter (false);
   @Output() remove = new EventEmitter (false);
 
-
   displayedColumns = ['name', 'category', 'actions'];
 
   constructor(
@@ -32,4 +31,5 @@ export class CursosListaComponent {
   onDelete(curso: Cursos){
     this.remove.emit(curso);
   }
+
 }

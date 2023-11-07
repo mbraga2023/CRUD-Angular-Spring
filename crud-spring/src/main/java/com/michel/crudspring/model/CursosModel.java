@@ -24,10 +24,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 
 @Entity
-@Data
 @Table(name="cursos")
 @SQLDelete(sql = "UPDATE cursos SET status = 'Inativo' WHERE id = ?") 
 @Where(clause = "status = 'Ativo'")

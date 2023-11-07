@@ -1,5 +1,11 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, NonNullableFormBuilder, UntypedFormArray, Validators } from '@angular/forms';
+import { Component, ViewChild } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  NonNullableFormBuilder,
+  UntypedFormArray,
+  Validators,
+} from '@angular/forms';
 import { CursosService } from '../../services/cursos.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '@angular/common';
@@ -8,7 +14,7 @@ import { Cursos } from '../../model/cursos';
 import { Aulas } from '../../model/aulas';
 import { Subscription } from 'rxjs';
 import { FormUtilsService } from 'src/app/shared/form/form-utils.service';
-
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-cursos-form',
@@ -17,6 +23,7 @@ import { FormUtilsService } from 'src/app/shared/form/form-utils.service';
 })
 export class CursosFormComponent {
   form: FormGroup;
+
 
   constructor(
     private formBuilder: FormBuilder,
@@ -126,7 +133,7 @@ export class CursosFormComponent {
     this.onCancel();
   }
 
-    getAulasFormArray() {
+  getAulasFormArray() {
     return (<UntypedFormArray>this.form.get('aulas')).controls;
   }
 
@@ -139,6 +146,5 @@ export class CursosFormComponent {
     const aulas = this.form.get('aulas') as UntypedFormArray;
     aulas.removeAt(index);
   }
-
 
 }
